@@ -1,0 +1,34 @@
+# Environment (keep the documented defaults)
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+project_venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+htmlcov/
+.coverage
+coverage/
+
+# Node / Vite
+node_modules/
+dist/
+*.tsbuildinfo
+
+# Playwright output
+test-results/
+playwright-report/
+
+# Logs, scratch and OS files
+*.log
+logs/
+tmp/
+.DS_Store
+
+# Not part of this repository
+.github/

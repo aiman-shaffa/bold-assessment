@@ -20,6 +20,7 @@ All values are trimmed, and blank becomes null.
 - **Salary:** `$`, `,` and spaces are stripped, and an optional `k` multiplies by 1000. The result must be a positive integer; otherwise the salary becomes null and the row is still imported.
 - **Names:** NFC-normalized, 1 to 100 characters, made of Unicode letters, combining marks, space, `'`, `-` and `.`.
 - **Phone, role, source and notes:** stored verbatim after trimming. SQL-looking text is stored as inert text, because every query is parameterized.
+- **Stray values:** a row with non-blank values past the last column (usually an unquoted comma) is rejected (`more values than columns`) instead of being imported with a truncated field. A trailing comma is fine.
 - **Upload:** a file over 5 MB → 413. Invalid UTF-8 or missing columns → 400. A BOM is accepted.
 
 ## Simplifications and deviations

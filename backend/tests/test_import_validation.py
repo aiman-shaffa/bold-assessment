@@ -160,6 +160,35 @@ async def test_extra_columns_are_ignored(client):
     assert response.json()["imported"] == 1
 
 
+async def test_a_row_with_more_values_than_columns_is_rejected(client, app):
+    # An unquoted comma in the notes splits them into a 13th value.
+    split_note = ROW_C1001.replace("Strong React portfolio", "Strong React, Vue portfolio")
+
+    response = await _import(client, "\n".join([HEADER, split_note]).encode())
+
+    assert response.status_code == 200
+    assert response.json()["imported"] == 0
+    assert response.json()["rejected"] == [
+        {"row": 1, "candidate_id": "C-1001", "reason": "more values than columns"}
+    ]
+    assert await _candidate_count(app) == 0
+
+
+async def test_extra_values_are_reported_after_the_field_reasons(client):
+    row = ROW_C1001.replace(",US-MW,", ",Mars,") + ",stray"
+
+    response = await _import(client, "\n".join([HEADER, row]).encode())
+
+    assert response.json()["rejected"][0]["reason"] == "unknown region; more values than columns"
+
+
+async def test_a_trailing_comma_is_not_an_extra_value(client):
+    response = await _import(client, "\n".join([HEADER, ROW_C1001 + ","]).encode())
+
+    assert response.json()["imported"] == 1
+    assert response.json()["rejected"] == []
+
+
 async def test_an_empty_file_is_refused(client):
     response = await _import(client, b"")
 

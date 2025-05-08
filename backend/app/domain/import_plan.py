@@ -50,10 +50,16 @@ FILLABLE_FIELDS: tuple[str, ...] = tuple(
 
 @dataclass(frozen=True)
 class ImportRow:
-    """One CSV record. ``row`` is 1-based and excludes the header."""
+    """One CSV record. ``row`` is 1-based and excludes the header.
+
+    ``extra_values`` counts non-blank values past the last header column,
+    usually an unquoted comma that split a field. They have no column to land
+    in, so the row is rejected rather than imported with a truncated value.
+    """
 
     row: int
     values: Mapping[str, str | None]
+    extra_values: int = 0
 
     @property
     def candidate_id(self) -> str | None:
@@ -100,6 +106,7 @@ class ImportPlan:
 
 
 ID_COLLISION = "candidate_id collision"
+EXTRA_VALUES = "more values than columns"
 
 # Candidate field -> CSV column, so reasons name the column the Admin must fix.
 _COLUMN_FOR_FIELD: Mapping[str, str] = {field: column for column, field in CSV_COLUMNS.items()}
@@ -116,12 +123,18 @@ _INVALID_REASONS: Mapping[str, str] = {
 def parse_candidate(row: ImportRow) -> Candidate | Rejection:
     """Normalize one record into a Candidate, or reject it with every reason."""
     data = {model_field: row.values.get(column) for column, model_field in CSV_COLUMNS.items()}
+    reasons: list[str] = []
     try:
-        return Candidate.model_validate(data)
+        candidate = Candidate.model_validate(data)
     except ValidationError as exc:
-        reasons = [_reason(error) for error in exc.errors()]
         # One reason per field, in CSV column order (Pydantic reports in field order).
-        return Rejection(row.row, row.candidate_id, "; ".join(dict.fromkeys(reasons)))
+        reasons = [_reason(error) for error in exc.errors()]
+    else:
+        if not row.extra_values:
+            return candidate
+    if row.extra_values:
+        reasons.append(EXTRA_VALUES)
+    return Rejection(row.row, row.candidate_id, "; ".join(dict.fromkeys(reasons)))
 
 
 def _reason(error: Mapping[str, Any]) -> str:

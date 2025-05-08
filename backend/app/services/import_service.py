@@ -3,6 +3,7 @@
 import csv
 import io
 from dataclasses import dataclass
+from typing import Any
 
 from sqlalchemy.ext.asyncio import AsyncEngine
 
@@ -56,9 +57,16 @@ def parse_csv(data: bytes) -> list[ImportRow]:
         raise InvalidImportFile(f"missing columns: {', '.join(missing)}")
     try:
         # enumerate counts CSV records, so a multi-line note doesn't shift row numbers.
-        return [ImportRow(number, record) for number, record in enumerate(reader, start=1)]
+        return [_import_row(number, record) for number, record in enumerate(reader, start=1)]
     except csv.Error as exc:
         raise InvalidImportFile(f"file is not a readable CSV: {exc}") from exc
+
+
+def _import_row(number: int, record: dict[str | None, Any]) -> ImportRow:
+    # DictReader collects values beyond the header under the key None. A
+    # trailing comma only adds blanks, which are harmless.
+    extras = record.pop(None, None) or []
+    return ImportRow(number, record, extra_values=sum(1 for value in extras if value.strip()))
 
 
 async def import_candidates(owner_engine: AsyncEngine, data: bytes) -> ImportReport:

@@ -71,7 +71,7 @@ To reset everything, run `docker compose down -v`. This deletes the database vol
 
 ## Local development
 
-You need uv, Node 20+ and Docker (for Postgres).
+You need uv, Node 22 (see `frontend/.nvmrc`) and Docker (for Postgres).
 
 ```sh
 docker compose up -d db              # Postgres only, on localhost:5433

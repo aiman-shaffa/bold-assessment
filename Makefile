@@ -56,12 +56,14 @@ web: ## Run the Vite dev server on :5173 (proxies /api to :8000)
 
 # --- Checks ------------------------------------------------------------------
 
-lint: ## Lint and format-check the backend
+lint: ## Lint the backend (ruff) and the frontend (ESLint, tsc)
 	cd backend && uv run ruff check . && uv run ruff format --check .
+	cd frontend && npm run lint && npx tsc -b
 
 
-test: db ## Run the default suite (unit, API integration, RLS)
+test: db ## Run the backend suite (unit, API, RLS) and the UI unit tests
 	cd backend && uv run pytest
+	cd frontend && npm test
 
 e2e: up ## Run the Playwright e2e suite against the running stack
 	cd backend && uv run playwright install chromium

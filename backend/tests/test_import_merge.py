@@ -51,9 +51,7 @@ async def _import(client: httpx.AsyncClient, csv_bytes: bytes) -> dict:
 
 
 async def _listing(client: httpx.AsyncClient) -> dict:
-    response = await client.get(
-        "/api/v1/candidates", params={"page_size": 100}, headers=AS_ADMIN
-    )
+    response = await client.get("/api/v1/candidates", params={"page_size": 100}, headers=AS_ADMIN)
     return response.json()
 
 
@@ -86,9 +84,7 @@ async def test_reimporting_the_real_export_changes_nothing(client, candidates_cs
     assert await _listing(client) == before
 
 
-async def test_a_later_import_fills_blanks_of_a_stored_candidate_but_never_overwrites(
-    client, app
-):
+async def test_a_later_import_fills_blanks_of_a_stored_candidate_but_never_overwrites(client, app):
     await _import(client, f"{HEADER}\n{ROW_C1016}\n".encode())
 
     report = await _import(client, f"{HEADER}\n{ROW_C1032}\n".encode())

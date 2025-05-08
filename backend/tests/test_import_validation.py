@@ -12,7 +12,7 @@ HEADER = (
     "salary_expectation,applied_date,status,source,notes"
 )
 ROW_C1001 = (
-    'C-1001,Alicia,Trent,alicia.trent@gmail.com,+1 (734) 555-0142,US-MW,'
+    "C-1001,Alicia,Trent,alicia.trent@gmail.com,+1 (734) 555-0142,US-MW,"
     'Full-Stack Engineer,"$95,000",2026-05-14,Active,LinkedIn,Strong React portfolio'
 )
 ROW_C1037 = (
@@ -46,9 +46,7 @@ async def _candidate_count(app) -> int:
 # --- Rejections from the real export ---------------------------------------
 
 
-async def test_the_real_export_rejects_each_invalid_row_with_every_reason(
-    client, candidates_csv
-):
+async def test_the_real_export_rejects_each_invalid_row_with_every_reason(client, candidates_csv):
     report = (await _import(client, candidates_csv)).json()
 
     validation_rejections = [
@@ -74,7 +72,9 @@ async def test_the_real_export_rejects_each_invalid_row_with_every_reason(
 async def test_normalized_rows_from_the_real_export_are_imported(client, candidates_csv):
     await _import(client, candidates_csv)
 
-    listing = (await client.get("/api/v1/candidates", params={"page_size": 100}, headers=AS_ADMIN)).json()
+    listing = (
+        await client.get("/api/v1/candidates", params={"page_size": 100}, headers=AS_ADMIN)
+    ).json()
     by_id = {item["legacy_id"]: item for item in listing["items"]}
     assert by_id["C-1042"]["region"] == "US-MW"  # us-mw
     assert by_id["C-1043"]["region"] == "CO-BOG"  # " CO-BOG "

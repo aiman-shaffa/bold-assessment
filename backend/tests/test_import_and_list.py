@@ -11,7 +11,7 @@ HEADER = (
 )
 # Real rows from candidates_import.csv
 ROW_C1001 = (
-    'C-1001,Alicia,Trent,alicia.trent@gmail.com,+1 (734) 555-0142,US-MW,'
+    "C-1001,Alicia,Trent,alicia.trent@gmail.com,+1 (734) 555-0142,US-MW,"
     'Full-Stack Engineer,"$95,000",2026-05-14,Active,LinkedIn,Strong React portfolio'
 )
 ROW_C1008 = (

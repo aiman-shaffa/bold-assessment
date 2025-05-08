@@ -2,7 +2,8 @@
 
 ``parse_rows`` validates each raw CSV record once; ``plan_import`` turns the
 parsed records into the Candidates to insert plus the Import Report entries.
-Every row ends up in exactly one bucket: new Candidate, Merge or Rejection. Nothing is dropped silently.
+Every row ends up in exactly one bucket: new Candidate, Merge or Rejection.
+Nothing is dropped silently.
 
 A row that fails the Candidate model is rejected with every reason, each using
 a fixed prefix. A valid row is then placed by identity (ADR-0001):

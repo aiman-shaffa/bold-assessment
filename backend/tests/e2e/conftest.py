@@ -43,7 +43,9 @@ def imported_stack() -> None:
     response = httpx.post(
         f"{API_URL}/api/v1/candidates/import",
         headers={"X-Recruiter-Id": ADMIN_ID},
-        files={"file": ("candidates_import.csv", (REPO_ROOT / "candidates_import.csv").read_bytes())},
+        files={
+            "file": ("candidates_import.csv", (REPO_ROOT / "candidates_import.csv").read_bytes())
+        },
         timeout=30,
     )
     response.raise_for_status()

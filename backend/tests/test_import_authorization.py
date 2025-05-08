@@ -6,8 +6,11 @@ HEADER = (
     "candidate_id,first_name,last_name,email,phone,region_code,desired_role,"
     "salary_expectation,applied_date,status,source,notes"
 )
-ROW = "C-1041,Petra,Novak,petra.novak@gmail.com,(602) 555-0197,US-W,QA Engineer,80000,,Active,Careers page,"
-CSV_BYTES = f"{HEADER}\n{ROW}".encode("utf-8")
+ROW = (
+    "C-1041,Petra,Novak,petra.novak@gmail.com,(602) 555-0197,US-W,"
+    "QA Engineer,80000,,Active,Careers page,"
+)
+CSV_BYTES = f"{HEADER}\n{ROW}".encode()
 
 
 async def _import(client, headers: dict[str, str]):

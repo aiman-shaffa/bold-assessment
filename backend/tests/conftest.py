@@ -44,9 +44,7 @@ async def _create_database_if_missing(url: URL) -> None:
         database="postgres",
     )
     try:
-        exists = await conn.fetchval(
-            "SELECT 1 FROM pg_database WHERE datname = $1", url.database
-        )
+        exists = await conn.fetchval("SELECT 1 FROM pg_database WHERE datname = $1", url.database)
         if not exists:
             # Identifiers can't be bound parameters; quote it ourselves.
             quoted = '"' + url.database.replace('"', '""') + '"'

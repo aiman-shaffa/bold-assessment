@@ -7,7 +7,7 @@ CSV        ?= candidates_import.csv
 COMPOSE    ?= docker compose
 
 .DEFAULT_GOAL := help
-.PHONY: help up down reset logs ps import install db migrate api web test e2e test-all
+.PHONY: help up down reset logs ps import install db migrate api web lint test e2e test-all
 
 help: ## List the available commands
 	@grep -E '^[a-zA-Z0-9_-]+:.*## ' $(MAKEFILE_LIST) | awk -F':.*## ' '{printf "  \033[36m%-10s\033[0m %s\n", $$1, $$2}'
@@ -54,7 +54,11 @@ api: migrate ## Run the API locally with reload on :8000
 web: ## Run the Vite dev server on :5173 (proxies /api to :8000)
 	cd frontend && npm run dev
 
-# --- Tests -------------------------------------------------------------------
+# --- Checks ------------------------------------------------------------------
+
+lint: ## Lint and format-check the backend
+	cd backend && uv run ruff check . && uv run ruff format --check .
+
 
 test: db ## Run the default suite (unit, API integration, RLS)
 	cd backend && uv run pytest

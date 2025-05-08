@@ -117,9 +117,7 @@ def _escape_like(term: str) -> str:
     return re.sub(r"([%_\\])", r"\\\1", term)
 
 
-def _list_conditions(
-    *, search: str | None, status: Status | None
-) -> list[ColumnElement[bool]]:
+def _list_conditions(*, search: str | None, status: Status | None) -> list[ColumnElement[bool]]:
     conditions: list[ColumnElement[bool]] = []
     if status is not None:
         conditions.append(candidates.c.status == status.value)

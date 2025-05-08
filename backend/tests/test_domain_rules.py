@@ -353,8 +353,8 @@ def test_free_text_fields_are_trimmed_and_otherwise_verbatim():
     # C-1050's multi-line note, with padding added around phone, role and source
     record = (
         "C-1050,Oliver,Grant,oliver.grant@gmail.com,  (802) 555-0168 ,US-NE,"
-        " Data Engineer ,103000,2026-07-13,Active, LinkedIn ,\"Interview notes:\n"
-        "Round 1 passed.\nRound 2 pending scheduling.\""
+        ' Data Engineer ,103000,2026-07-13,Active, LinkedIn ,"Interview notes:\n'
+        'Round 1 passed.\nRound 2 pending scheduling."'
     )
     candidate = accepted(record)
     assert candidate.phone == "(802) 555-0168"

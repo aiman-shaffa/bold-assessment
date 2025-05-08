@@ -29,7 +29,7 @@ services:
       db:
         condition: service_healthy
     ports:
-      - "127.0.0.1:8000:8000"
+      - "127.0.0.1:${API_HOST_PORT:-8000}:8000"
     healthcheck:
       # Healthy once migrations have run and the API answers from the database.
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v1/recruiters', timeout=2)"]
@@ -45,7 +45,7 @@ services:
       api:
         condition: service_healthy
     ports:
-      - "127.0.0.1:5173:5173"
+      - "127.0.0.1:${WEB_HOST_PORT:-5173}:5173"
     healthcheck:
       test: ["CMD", "wget", "-q", "--spider", "http://localhost:5173/"]
       interval: 2s

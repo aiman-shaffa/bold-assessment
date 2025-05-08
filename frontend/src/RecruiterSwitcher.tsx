@@ -1,6 +1,6 @@
 import type { Recruiter } from "./api";
 
-function regionLabel(recruiter: Recruiter): string {
+export function regionLabel(recruiter: Recruiter): string {
   return recruiter.role === "admin" ? "All Regions" : recruiter.regions.join(", ");
 }
 
@@ -14,8 +14,8 @@ export function RecruiterSwitcher({
   onChange: (recruiterId: string) => void;
 }) {
   return (
-    <label>
-      Viewing as{" "}
+    <label className="field field--switcher">
+      <span className="field__label">Viewing as</span>
       <select value={value} onChange={(event) => onChange(event.target.value)}>
         {recruiters.map((r) => (
           <option key={r.id} value={r.id}>

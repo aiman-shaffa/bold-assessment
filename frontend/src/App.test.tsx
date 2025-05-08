@@ -93,12 +93,38 @@ describe("App", () => {
     await waitFor(() => expect(candidateRequests.at(-1)?.recruiterId).toBe("R-102"));
   });
 
-  it("explains an empty result", async () => {
+  it("shows whose scope is listed", async () => {
+    renderApp();
+    const scope = await screen.findByRole("region", { name: "Current scope" });
+    expect(scope).toHaveTextContent("Dana Whitmore");
+    expect(scope).toHaveTextContent("All Regions");
+
+    await userEvent.selectOptions(screen.getByLabelText("Viewing as"), "R-102");
+
+    expect(screen.getByRole("region", { name: "Current scope" })).toHaveTextContent(
+      /Caleb Nguyen.*US-MW.*US-NE/,
+    );
+  });
+
+  it("explains an empty scope", async () => {
     candidateHandler = () => Response.json({ items: [], total: 0, page: 1, page_size: 25 });
     renderApp();
 
     expect(await screen.findByText(/No candidates match/)).toBeInTheDocument();
+    expect(screen.getByText(/importing the legacy CSV/)).toBeInTheDocument();
     expect(screen.queryByRole("table")).not.toBeInTheDocument();
+  });
+
+  it("offers to clear filters that matched nothing", async () => {
+    renderApp();
+    await screen.findByRole("cell", { name: "Test Person1" });
+    candidateHandler = () => Response.json({ items: [], total: 0, page: 1, page_size: 25 });
+
+    await userEvent.selectOptions(screen.getByLabelText("Status"), "withdrawn");
+    await userEvent.click(await screen.findByRole("button", { name: "Clear filters" }));
+
+    expect(screen.getByLabelText("Status")).toHaveValue("");
+    expect(screen.getByLabelText("Search")).toHaveValue("");
   });
 
   it("shows the API's error and does not retry a client error", async () => {
@@ -108,5 +134,19 @@ describe("App", () => {
     const alert = await screen.findByRole("alert");
     expect(within(alert).getByText(/403 Unknown recruiter/)).toBeInTheDocument();
     expect(candidateRequests).toHaveLength(1);
+  });
+
+  it("retries a server error, then lets the user try again", { timeout: 10_000 }, async () => {
+    candidateHandler = () => Response.json({ detail: "Database unavailable" }, { status: 503 });
+    renderApp();
+    // Two automatic retries with backoff come first (about three seconds).
+    const alert = await screen.findByRole("alert", {}, { timeout: 6_000 });
+    expect(candidateRequests).toHaveLength(3);
+    candidateHandler = () =>
+      Response.json({ items: [candidate(1)], total: 1, page: 1, page_size: 25 });
+
+    await userEvent.click(within(alert).getByRole("button", { name: "Try again" }));
+
+    expect(await screen.findByRole("cell", { name: "Test Person1" })).toBeInTheDocument();
   });
 });

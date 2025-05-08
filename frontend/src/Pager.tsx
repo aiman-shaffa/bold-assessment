@@ -15,7 +15,7 @@ export function Pager({
       <button type="button" disabled={page <= 1} onClick={() => onPageChange(page - 1)}>
         Previous
       </button>
-      <span>
+      <span className="pager__position">
         Page {page} of {pageCount} · {total} candidates
       </span>
       <button type="button" disabled={page >= pageCount} onClick={() => onPageChange(page + 1)}>

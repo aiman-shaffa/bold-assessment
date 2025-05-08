@@ -80,6 +80,16 @@ async def test_search_matches_names_email_and_role_case_insensitively(
     assert _ids(await _list(client, DANA, search=search)) == expected
 
 
+async def test_surrounding_spaces_in_search_are_ignored(candidates, client):
+    assert _ids(await _list(client, DANA, search="  trent  ")) == ["C-1001"]
+
+
+async def test_an_all_space_search_lists_the_whole_scope(candidates, client):
+    response = await _list(client, DANA, search="   ")
+
+    assert response.json()["total"] == len(ROWS)
+
+
 async def test_search_is_accent_sensitive(candidates, client):
     # Not "Tomas": tomas.herrera@gmail.com would rightly match by email.
     assert _ids(await _list(client, DANA, search="Müller")) == ["C-1015"]

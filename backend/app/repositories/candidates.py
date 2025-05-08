@@ -88,7 +88,8 @@ async def list_page(
     *,
     search: str | None,
     status: Status | None,
-    limit: int, offset: int
+    limit: int,
+    offset: int,
 ) -> tuple[list[RowMapping], int]:
     """One page of the Candidates visible on ``conn``, and how many match in all.
 
@@ -122,10 +123,11 @@ def _list_conditions(
     conditions: list[ColumnElement[bool]] = []
     if status is not None:
         conditions.append(candidates.c.status == status.value)
-    if search:
+    # A blank or all-space term is no search at all, not a search for spaces.
+    if search and (term := search.strip()):
         # Case-insensitive, accent-sensitive substring; the term is a bound
         # parameter, so SQL-looking text is only ever compared, never run.
-        pattern = f"%{_escape_like(search)}%"
+        pattern = f"%{_escape_like(term)}%"
         full_name = candidates.c.first_name + " " + candidates.c.last_name
         conditions.append(
             or_(
